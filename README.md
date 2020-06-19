@@ -6,7 +6,7 @@
 |liqpaylogo| SDK-Python
 =====
 
-:Version: 1.0.1
+:Version: 1.0.2
 :Web: https://www.liqpay.ua/
 :Download: https://pypi.org/project/liqpay-sdk-python3/
 :Source: https://github.com/aorzh/liqpay-sdk-python3
