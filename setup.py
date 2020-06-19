@@ -8,6 +8,7 @@ setup(
     name='liqpay-sdk-python3',
     version='1.0.1',
     description='LiqPay Python3 SDK',
+    long_description_content_type='text/markdown',
     long_description=long_description,
     url="https://github.com/aorzh/liqpay-sdk-python3",
     packages=find_packages(),
