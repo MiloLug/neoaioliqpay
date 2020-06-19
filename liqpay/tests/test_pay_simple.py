@@ -37,5 +37,6 @@ class TestLiqPaySimple(unittest.TestCase):
         del params['amount']
         self.assertRaises(ParamValidationError, self.liqpay.cnb_form, params)
 
+
 if __name__ == '__main__':
     unittest.main()

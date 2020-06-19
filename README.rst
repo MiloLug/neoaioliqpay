@@ -14,7 +14,6 @@
 
 What python version is supported?
 ============
-- Python 2.7
 - Python 3.4, 3.5, 3.6
 
 Get Started
