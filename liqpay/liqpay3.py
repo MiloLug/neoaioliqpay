@@ -5,8 +5,8 @@ supports python 3 version
 requires requests module
 """
 
-__title__ = "LiqPay Python SDK"
-__version__ = "1.0"
+__title__ = "LiqPay Python3 SDK"
+__version__ = "1.0.1"
 
 import base64
 from copy import deepcopy

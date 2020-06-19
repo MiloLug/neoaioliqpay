@@ -27,11 +27,7 @@ Installation
 ============
 From pip
 ::
-    $ pip install liqpay-python
-
-From github
-::
-    $ pip install git+https://github.com/liqpay/sdk-python#egg=liqpay
+    $ pip install liqpay-sdk-python3
 
 Working with LiqPay Callback locally
 ============

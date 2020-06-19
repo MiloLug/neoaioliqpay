@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='liqpay-python3',
+    name='liqpay-sdk-python3',
     version='1.0.1',
     description='LiqPay Python3 SDK',
     long_description=long_description,
