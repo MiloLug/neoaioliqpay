@@ -49,19 +49,11 @@ class LiqPay(object):
         params.update(public_key=self._public_key)
         return params
 
-    def api(self, url, params=None):
-        params = self._prepare_params(params)
-
-        json_encoded_params = json.dumps(params)
-        private_key = self._private_key
-        signature = self._make_signature(private_key, json_encoded_params, private_key)
-
-        request_url = urljoin(self._host, url)
-        request_data = {"data": json_encoded_params, "signature": signature}
-        response = requests.post(request_url, data=request_data, verify=False)
-        return json.loads(response.content.decode("utf-8"))
-
-    def cnb_form(self, params):
+    def _encode_params(self, params):
+        """
+        :param params: dict
+        :return: dict
+        """
         params = self._prepare_params(params)
         params_validator = (
             ("amount", lambda x: x is not None and float(x) > 0),
@@ -83,7 +75,38 @@ class LiqPay(object):
         )
 
         encoded_data = self.data_to_sign(params)
+        return encoded_data
+
+
+    def api(self, url, params=None):
+        params = self._prepare_params(params)
+
+        json_encoded_params = json.dumps(params)
+        private_key = self._private_key
+        signature = self._make_signature(private_key, json_encoded_params, private_key)
+
+        request_url = urljoin(self._host, url)
+        request_data = {"data": json_encoded_params, "signature": signature}
+        response = requests.post(request_url, data=request_data, verify=False)
+        return json.loads(response.content.decode("utf-8"))
+
+    def checkout_url(self, params):
+        """
+        This method contains almost same like cnb_form, except we are return just
+        url which will helpful for building Restful services.
+        :param params:
+        :return:
+        """
+        encoded_data = self._encode_params(params)
+        signature = self._make_signature(self._private_key, encoded_data, self._private_key)
+        form_action_url = urljoin(self._host, "3/checkout/")
+
+        return f'{form_action_url}?data={encoded_data}&signature={signature}'
+
+    def cnb_form(self, params):
+        encoded_data = self._encode_params(params)
         params_templ = {"data": encoded_data}
+        language = params.get("language", "ru")
 
         params_templ["signature"] = self._make_signature(self._private_key, params_templ["data"], self._private_key)
         form_action_url = urljoin(self._host, "3/checkout/")
