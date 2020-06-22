@@ -28,8 +28,7 @@ Get Started
 Installation
 ============
 From pip
-::
-    $ pip install liqpay-sdk-python3
+```pip install liqpay-sdk-python3```
 
 Working with LiqPay Callback locally
 ============
@@ -42,25 +41,46 @@ Example 1: Basic
 -------
 
 **Backend**
+Get payment button (html response)
+```
+liqpay = LiqPay(public_key, private_key)
+html = liqpay.cnb_form({
+    'action': 'pay',
+    'amount': '1',
+    'currency': 'USD',
+    'description': 'description text',
+    'order_id': 'order_id_1',
+    'version': '3',
+    'language': 'ru|uk|en'
+})
+```
 
-::
+Get plain checkout url:
 
-    liqpay = LiqPay(public_key, private_key)
-    html = liqpay.cnb_form({
-        'action': 'pay',
-        'amount': '1',
-        'currency': 'USD',
-        'description': 'description text',
-        'order_id': 'order_id_1',
-        'version': '3'
-    })
+```
+liqpay = LiqPay(public_key, private_key)
+html = liqpay.checkout_url({
+    'action': 'auth',
+    'amount': '1',
+    'currency': 'USD',
+    'description': 'description text',
+    'order_id': 'order_id_1',
+    'version': '3',
+    'language': 'ru|uk|en',
+    'recurringbytoken': '1'
+})
+# Response:
+
+str: https://www.liqpay.ua/api/3/checkout/?data=<decoded data>&signature=<decoded signature>
+
+```
+
 
 **Frontend**
 
 Variable ``html`` will contain next html form
 
-::
-
+```
     <form method="POST" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8">
         <input type="hidden" name="data" value="eyAidmVyc2lvbiIgOiAzLCAicHVibGljX2tleSIgOiAieW91cl9wdWJsaWNfa2V5IiwgImFjdGlv
         biIgOiAicGF5IiwgImFtb3VudCIgOiAxLCAiY3VycmVuY3kiIDogIlVTRCIsICJkZXNjcmlwdGlv
@@ -69,19 +89,18 @@ Variable ``html`` will contain next html form
         <input type="image"
         src="//static.liqpay.ua/buttons/p1ru.radius.png"/>
     </form>
+```
 
 Example 2: Integrate Payment widget to Django
 -------
-`Payment widget documentation`_
+`Payment widget documentation` 
+https://www.liqpay.ua/documentation/en/api/aquiring/widget/
 
-.. _`Payment widget documentation`:
-    https://www.liqpay.ua/documentation/en/api/aquiring/widget/
+*Backend*
 
-**Backend**
+`views.py`
 
-views.py
-
-::
+```
 
     from liqpay import LiqPay
 
@@ -120,10 +139,10 @@ views.py
             response = liqpay.decode_data_from_str(data)
             print('callback data', response)
             return HttpResponse()
+```
+`urls.py`
 
-urls.py
-
-::
+```
 
     from django.conf.urls import url
 
@@ -134,10 +153,10 @@ urls.py
         url(r'^pay/$', PayView.as_view(), name='pay_view'),
         url(r'^pay-callback/$', PayCallbackView.as_view(), name='pay_callback'),
     ]
+```
+*Frontend*
 
-**Frontend**
-
-::
+```
 
     <div id="liqpay_checkout"></div>
     <script>
@@ -158,3 +177,4 @@ urls.py
         };
     </script>
     <script src="//static.liqpay.ua/libjs/checkout.js" async></script>
+```
