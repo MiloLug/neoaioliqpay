@@ -1,13 +1,13 @@
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360/)
 
-[![SDK-Python3]  https://www.liqpay.ua/1508940109424071/static/img/images/logo.svg]
+[![SDK-Python3] (https://www.liqpay.ua/1508940109424071/static/img/images/logo.svg)](https://www.liqpay.ua/1508940109424071/static/img/images/logo.svg)
 
-:Version: 1.0.3
-:Web: https://www.liqpay.ua/
-:Download: https://pypi.org/project/liqpay-sdk-python3/
-:Source: https://github.com/aorzh/liqpay-sdk-python3
-:Documentation: https://www.liqpay.ua/documentation/en/
-:Keywords: liqpay, privat24, privatbank, python, internet acquiring, P2P payments, two-step payments
+* Version: 1.0.3
+* Web: https://www.liqpay.ua/
+* Download: https://pypi.org/project/liqpay-sdk-python3/
+* Source: https://github.com/aorzh/liqpay-sdk-python3
+* Documentation: https://www.liqpay.ua/documentation/en/
+* Keywords: liqpay, privat24, privatbank, python, internet acquiring, P2P payments, two-step payments
 
 
 What python version is supported?
