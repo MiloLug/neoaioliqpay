@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='liqpay-sdk-python3',
-    version='1.0.2',
+    version='1.0.3',
     description='LiqPay Python3 SDK',
     long_description_content_type='text/markdown',
     long_description=long_description,
