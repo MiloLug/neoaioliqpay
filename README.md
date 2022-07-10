@@ -2,17 +2,17 @@
 
 [![SDK-Python3](https://www.liqpay.ua/1508940109424071/static/img/images/logo.svg)](https://www.liqpay.ua/1508940109424071/static/img/images/logo.svg)
 
-* Version: 1.0.3
+* Version: 1.0.0
 * Web: https://www.liqpay.ua/
-* Download: https://pypi.org/project/liqpay-sdk-python3/
-* Source: https://github.com/aorzh/liqpay-sdk-python3
+* Download: https://pypi.org/project/aioliqpay
+* Source: https://github.com/toxazhl/aioliqpay
 * Documentation: https://www.liqpay.ua/documentation/en/
-* Keywords: liqpay, privat24, privatbank, python, internet acquiring, P2P payments, two-step payments
+* Keywords: aioliqpay, liqpay, privat24, privatbank, python, internet acquiring, P2P payments, two-step payments, asyncio
 
 
 What python version is supported?
 ============
-- Python 3.4, 3.5, 3.6
+- Python 3.6, 3.7, 3.8, 3.9, 3.10
 
 Get Started
 ============
@@ -24,7 +24,7 @@ Get Started
 Installation
 ============
 From pip
-```pip install liqpay-sdk-python3```
+```pip install aioliqpay```
 
 Working with LiqPay Callback locally
 ============
@@ -40,15 +40,14 @@ Example 1: Basic
 Get payment button (html response)
 ```
 liqpay = LiqPay(public_key, private_key)
-html = liqpay.cnb_form({
-    'action': 'pay',
-    'amount': '1',
-    'currency': 'USD',
-    'description': 'description text',
-    'order_id': 'order_id_1',
-    'version': '3',
-    'language': 'ru|uk|en'
-})
+html = liqpay.cnb_form(
+    action='pay',
+    amount=1,
+    currency='UAH',
+    description='description text',
+    order_id='order_id_1',
+    language='ua'
+)
 ```
 
 Get plain checkout url:
@@ -56,14 +55,13 @@ Get plain checkout url:
 ```
 liqpay = LiqPay(public_key, private_key)
 html = liqpay.checkout_url({
-    'action': 'auth',
-    'amount': '1',
-    'currency': 'USD',
-    'description': 'description text',
-    'order_id': 'order_id_1',
-    'version': '3',
-    'language': 'ru|uk|en',
-    'recurringbytoken': '1'
+    action='auth',
+    amount=1,
+    currency='UAH',
+    description='description text',
+    order_id='order_id_1',
+    language='ua',
+    recurringbytoken=1'
 })
 # Response:
 
@@ -98,7 +96,7 @@ https://www.liqpay.ua/documentation/en/api/aquiring/widget/
 
 ```
 
-    from liqpay import LiqPay
+    from aioliqpay import LiqPay
 
     from django.views.generic import TemplateView
     from django.shortcuts import render
@@ -111,16 +109,15 @@ https://www.liqpay.ua/documentation/en/api/aquiring/widget/
         liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
         params = {
             'action': 'pay',
-            'amount': '100',
+            'amount': 100,
             'currency': 'USD',
             'description': 'Payment for clothes',
             'order_id': 'order_id_1',
-            'version': '3',
             'sandbox': 0, # sandbox mode, set to 1 to enable it
             'server_url': 'https://test.com/billing/pay-callback/', # url to callback view
         }
         signature = liqpay.cnb_signature(params)
-        data = liqpay.cnb_data(params)
+        data = liqpay.cnb_data(**params)
         return render(request, self.template_name, {'signature': signature, 'data': data})
 
     @method_decorator(csrf_exempt, name='dispatch')
