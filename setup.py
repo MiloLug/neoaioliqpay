@@ -5,13 +5,13 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='liqpay-sdk-python3',
-    version='1.0.3',
-    description='LiqPay Python3 SDK',
+    name='aioliqpay-sdk-python3',
+    version='1.0.0',
+    description='asyncio LiqPay Python3 SDK',
     long_description_content_type='text/markdown',
     long_description=long_description,
-    url="https://github.com/aorzh/liqpay-sdk-python3",
+    url="https://github.com/toxazhl/aioLiqpay",
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['requests']
+    install_requires=['aiohttp']
 )

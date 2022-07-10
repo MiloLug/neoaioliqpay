@@ -1,24 +1,10 @@
-"""
-LiqPay Python SDK
-~~~~~~~~~~~~~~~~~
-supports python 3 version
-requires requests module
-"""
-
-__title__ = "LiqPay Python3 SDK"
-__version__ = "1.0.1"
-
 import base64
 from copy import deepcopy
 import hashlib
 import json
 from urllib.parse import urljoin
 
-import requests
-
-
-class ParamValidationError(Exception):
-    pass
+import aiohttp
 
 
 class LiqPay(object):
@@ -34,7 +20,7 @@ class LiqPay(object):
         "result_url", "server_url", "type", "signature", "language", "sandbox"
     ]
 
-    def __init__(self, public_key, private_key, host="https://www.liqpay.ua/api/"):
+    def __init__(self, public_key: str, private_key: str, host="https://www.liqpay.ua/api/"):
         self._public_key = public_key
         self._private_key = private_key
         self._host = host
@@ -45,6 +31,7 @@ class LiqPay(object):
         return base64.b64encode(hashlib.sha1(joined_fields).digest()).decode("ascii")
 
     def _prepare_params(self, params):
+        params = {k: v for k, v in params.items() if k is not None}
         params = {} if params is None else deepcopy(params)
         params.update(public_key=self._public_key)
         return params
@@ -55,22 +42,8 @@ class LiqPay(object):
         :return: dict
         """
         params = self._prepare_params(params)
-        params_validator = (
-            ("amount", lambda x: x is not None and float(x) > 0),
-            ("description", lambda x: x is not None)
-        )
-        for key, validator in params_validator:
-            if validator(params.get(key)):
-                continue
-
-            raise ParamValidationError("Invalid param: '{}'".format(key))
-
-        # spike to set correct values for language, currency and sandbox params
-        language = params.get("language", "ru")
-        currency = params["currency"]
+        
         params.update(
-            language=language,
-            currency=currency if currency != "RUR" else "RUB",
             sandbox=int(bool(params.get("sandbox")))
         )
 
@@ -78,7 +51,10 @@ class LiqPay(object):
         return encoded_data
 
 
-    def api(self, url, params=None):
+    async def api(
+        self, 
+        url: str,
+        params: dict = {}):
         params = self._prepare_params(params)
 
         json_encoded_params = json.dumps(params)
@@ -87,27 +63,77 @@ class LiqPay(object):
 
         request_url = urljoin(self._host, url)
         request_data = {"data": json_encoded_params, "signature": signature}
-        response = requests.post(request_url, data=request_data, verify=False)
-        return json.loads(response.content.decode("utf-8"))
+        async with aiohttp.ClientSession() as session:
+            async with session.post(request_url, data=request_data) as response:
+                return await response.json()
 
-    def checkout_url(self, params):
+    def checkout_url(
+        self,
+        action: str,
+        amount: float = None,
+        currency: str = None,
+        description: str = None,
+        order_id: str = None,
+        language: str = "ua",
+        customer: str = None,
+        server_url: str = None,
+        result_url: str = None,
+        params: dict = {},
+        **kwargs
+        ):
         """
         This method contains almost same like cnb_form, except we are return just
         url which will helpful for building Restful services.
         :param params:
         :return:
         """
+        params.update(kwargs)
+        params['action'] = action
+        params['amount'] = amount
+        params['currency'] = currency
+        params['description'] = description
+        params['order_id'] = order_id
+        params['language'] = language
+        params['customer'] = customer
+        params['server_url'] = server_url
+        params['result_url'] = result_url
+        
+        
         encoded_data = self._encode_params(params)
         signature = self._make_signature(self._private_key, encoded_data, self._private_key)
         form_action_url = urljoin(self._host, "3/checkout/")
 
         return f'{form_action_url}?data={encoded_data}&signature={signature}'
 
-    def cnb_form(self, params):
+    def cnb_form(
+        self,
+        action: str,
+        amount: float = None,
+        currency: str = None,
+        description: str = None,
+        order_id: str = None,
+        language: str = "ua",
+        customer: str = None,
+        server_url: str = None,
+        result_url: str = None,
+        params: dict = {},
+        **kwargs
+        ):
+        
+        params.update(kwargs)
+        params['action'] = action
+        params['amount'] = amount
+        params['currency'] = currency
+        params['description'] = description
+        params['order_id'] = order_id
+        params['language'] = language
+        params['customer'] = customer
+        params['server_url'] = server_url
+        params['result_url'] = result_url
+        
         encoded_data = self._encode_params(params)
         params_templ = {"data": encoded_data}
-        language = params.get("language", "ru")
-
+        
         params_templ["signature"] = self._make_signature(self._private_key, params_templ["data"], self._private_key)
         form_action_url = urljoin(self._host, "3/checkout/")
         format_input = (lambda k, v: self.INPUT_TEMPLATE.format(name=k, value=v))
