@@ -2,10 +2,10 @@
 
 [![SDK-Python3](https://www.liqpay.ua/logo_liqpay.svg?v=1651580791759)](https://www.liqpay.ua/)
 
-* Version: 2.1.0
+* Version: 2.1.1
 * Web: https://www.liqpay.ua/
 * Download: https://pypi.org/project/neoliqpay
-* Source: https://github.com/toxazhl/neoliqpay
+* Source: https://github.com/MiloLug/neoliqpay
 * Documentation: https://www.liqpay.ua/documentation/en/
 * Keywords: neoliqpay, aioliqpay, liqpay, privat24, privatbank, python, internet acquiring, P2P payments, two-step payments, asyncio
 
@@ -33,7 +33,7 @@ pip install "neoliqpay[async]"  # for async variant
 
 Working with LiqPay Callback locally
 ============
-If you need debugging API Callback on local environment use https://localtunnel.github.io/www/
+If you need debugging API Callback on local environment use https://github.com/inconshreveable/ngrok
 
 Using
 ============
