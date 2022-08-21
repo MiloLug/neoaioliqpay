@@ -2,8 +2,9 @@ import base64
 from copy import deepcopy
 import hashlib
 import json
-from typing import Optional
+from typing import Optional, Tuple
 from urllib.parse import urljoin
+
 
 class LiqPayBase:
     DEFAULT_API_URL = 'https://www.liqpay.ua/api/'
@@ -14,11 +15,6 @@ class LiqPayBase:
     <input type="image" src="//static.liqpay.ua/buttons/p1{language}.radius.png" name="btn_text" />
 </form>'''
     INPUT_TEMPLATE = '<input type="hidden" name="{name}" value="{value}"/>'
-
-    SUPPORTED_PARAMS = [
-        'public_key', 'amount', 'currency', 'description', 'order_id',
-        'result_url', 'server_url', 'type', 'signature', 'language', 'sandbox'
-    ]
 
     def __init__(
         self,
@@ -32,24 +28,16 @@ class LiqPayBase:
         self._host = host or self.DEFAULT_API_URL
         self._sandbox_mode = sandbox
 
-    def _make_signature(self, data: str) -> str:
-        data = self._private_key + data + self._private_key
-        return base64.b64encode(hashlib.sha1(data.encode('utf-8')).digest()).decode('ascii')
-
     def _prepare_params(self, params: dict) -> dict:
         params = {k: v for k, v in params.items() if k is not None}
-        params = {} if params is None else deepcopy(params)
-        params.update(public_key=self._public_key)
+        params['public_key']=self._public_key
+        params['sandbox']=int(bool(params.get('sandbox', self._sandbox_mode)))
         return params
 
     def _encode_params(self, params: dict) -> str:
         params = self._prepare_params(params)
         
-        params.update(
-            sandbox=int(bool(params.get('sandbox', self._sandbox_mode)))
-        )
-
-        encoded_data = self.data_to_sign(params)
+        encoded_data = self.encode_data(params)
         return encoded_data
 
 
@@ -75,6 +63,7 @@ class LiqPayBase:
         **kwargs
     ) -> str:
         """Returns url with encoded data in the query params"""
+        params = dict(params)
         params.update(kwargs)
         params['action'] = action
         params['amount'] = amount
@@ -87,7 +76,7 @@ class LiqPayBase:
         params['result_url'] = result_url
         
         encoded_data = self._encode_params(params)
-        signature = self._make_signature(encoded_data)
+        signature = self.make_signature(encoded_data)
         form_action_url = urljoin(self._host, '3/checkout/')
 
         return f'{form_action_url}?data={encoded_data}&signature={signature}'
@@ -106,6 +95,7 @@ class LiqPayBase:
         params: Optional[dict] = {},
         **kwargs
     ) -> str:
+        params = dict(params)
         params.update(kwargs)
         params['action'] = action
         params['amount'] = amount
@@ -120,10 +110,11 @@ class LiqPayBase:
         encoded_data = self._encode_params(params)
         params_templ = {'data': encoded_data}
         
-        params_templ['signature'] = self._make_signature(params_templ['data'])
+        params_templ['signature'] = self.make_signature(params_templ['data'])
         form_action_url = urljoin(self._host, '3/checkout/')
-        format_input = (lambda k, v: self.INPUT_TEMPLATE.format(name=k, value=v))
-        inputs = [format_input(k, v) for k, v in params_templ.items()]
+
+        inputs = [self.INPUT_TEMPLATE.format(name=k, value=v) for k, v in params_templ.items()]
+
         return self.FORM_TEMPLATE.format(
             action=form_action_url,
             language=language,
@@ -131,21 +122,28 @@ class LiqPayBase:
         )
 
     def cnb_signature(self, params: dict) -> str:
-        """Create a signature from given params"""
-        params = self._prepare_params(params)
-
-        data_to_sign = self.data_to_sign(params)
-        return self._make_signature(data_to_sign)
+        """Create a signature from given params, making some additions like public key"""
+        return self.make_signature(self._encode_params(params))
 
     def cnb_data(self, params: dict) -> str:
-        """Encodes fiven params using private key"""
-        params = self._prepare_params(params)
-        return self.data_to_sign(params)
+        """Encodes given params, making some additions like public key"""
+        return self._encode_params(params)
 
-    def str_to_sign(self, string: str) -> str:
-        return base64.b64encode(hashlib.sha1(string.encode('utf-8')).digest()).decode('ascii')
+    def cnb_signature_data_pair(self, params: dict) -> Tuple[str, str]:
+        """
+        Encodes params and reutrns signature with encoded data.
+        More effective way than using cnb_signature and cnb_data separately
+        """
+        encoded_data = self._encode_params(params)
+        return self.make_signature(encoded_data), encoded_data
 
-    def data_to_sign(self, params: dict) -> str:
+    def make_signature(self, data: str) -> str:
+        """Creates a signature from given string according to the docs"""
+        data = self._private_key + data + self._private_key
+        return base64.b64encode(hashlib.sha1(data.encode('utf-8')).digest()).decode('ascii')
+
+    def encode_data(self, params: dict) -> str:
+        """Encodes given dict to a string according to the docs"""
         return base64.b64encode(json.dumps(params).encode('utf-8')).decode('ascii')
 
     def decode_data_from_str(self, data: str):
@@ -174,4 +172,8 @@ class LiqPayBase:
         return json.loads(base64.b64decode(data).decode('utf-8'))
 
     def callback_is_valid(self, signature: str, signed_data: str) -> bool:
-        return self._make_signature(signed_data) == signature
+        """
+        Checks whether the data is valid or not according to the documentation for callbacks.
+        See https://www.liqpay.ua/documentation/api/callback
+        """
+        return self.make_signature(signed_data) == signature
