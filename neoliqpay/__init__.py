@@ -3,7 +3,7 @@ from .sync_liqpay import LiqPay
 
 
 __title__ = "asyncio LiqPay Python3 SDK"
-__version__ = "2.0.2"
+__version__ = "2.1.0"
 
 __all__ = [
     'AsyncLiqPay',

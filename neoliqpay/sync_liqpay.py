@@ -11,11 +11,17 @@ from .core import LiqPayBase
 
 
 class LiqPay(LiqPayBase):
-    def __init__(self, public_key: str, private_key: str, host: Optional[str] = None):
+    def __init__(
+        self,
+        public_key: str,
+        private_key: str,
+        host: Optional[str] = None,
+        sandbox: Optional[bool] = False
+    ):
         if not requests:
             raise NotImplementedError('requests module not found')
 
-        super(LiqPay, self).__init__(public_key, private_key, host)
+        super(LiqPay, self).__init__(public_key, private_key, host, sandbox)
 
     def api(
         self, 

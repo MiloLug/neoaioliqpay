@@ -20,31 +20,34 @@ class LiqPayBase:
         "result_url", "server_url", "type", "signature", "language", "sandbox"
     ]
 
-    def __init__(self, public_key: str, private_key: str, host: Optional[str] = None):
+    def __init__(
+        self,
+        public_key: str,
+        private_key: str,
+        host: Optional[str] = None,
+        sandbox: Optional[bool] = False
+    ):
         self._public_key = public_key
         self._private_key = private_key
         self._host = host or self.DEFAULT_API_URL
+        self._sandbox_mode = sandbox
 
-    def _make_signature(self, *args):
+    def _make_signature(self, *args) -> str:
         joined_fields = "".join(x for x in args)
         joined_fields = joined_fields.encode("utf-8")
         return base64.b64encode(hashlib.sha1(joined_fields).digest()).decode("ascii")
 
-    def _prepare_params(self, params: dict):
+    def _prepare_params(self, params: dict) -> dict:
         params = {k: v for k, v in params.items() if k is not None}
         params = {} if params is None else deepcopy(params)
         params.update(public_key=self._public_key)
         return params
 
-    def _encode_params(self, params: dict):
-        """
-        :param params: dict
-        :return: dict
-        """
+    def _encode_params(self, params: dict) -> str:
         params = self._prepare_params(params)
         
         params.update(
-            sandbox=int(bool(params.get("sandbox")))
+            sandbox=int(bool(params.get("sandbox", self._sandbox_mode)))
         )
 
         encoded_data = self.data_to_sign(params)
@@ -71,7 +74,7 @@ class LiqPayBase:
         result_url: Optional[str] = None,
         params: Optional[dict] = {},
         **kwargs
-    ):
+    ) -> str:
         """
         This method contains almost same like cnb_form, except we are return just
         url which will helpful for building Restful services.
@@ -109,7 +112,7 @@ class LiqPayBase:
         result_url: Optional[str] = None,
         params: Optional[dict] = {},
         **kwargs
-    ):
+    ) -> str:
         
         params.update(kwargs)
         params['action'] = action
@@ -145,10 +148,10 @@ class LiqPayBase:
         params = self._prepare_params(params)
         return self.data_to_sign(params)
 
-    def str_to_sign(self, string: str):
+    def str_to_sign(self, string: str) -> str:
         return base64.b64encode(hashlib.sha1(string.encode("utf-8")).digest()).decode("ascii")
 
-    def data_to_sign(self, params: dict):
+    def data_to_sign(self, params: dict) -> str:
         return base64.b64encode(json.dumps(params).encode("utf-8")).decode("ascii")
 
     def decode_data_from_str(self, data: str):
