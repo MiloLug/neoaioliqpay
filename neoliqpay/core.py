@@ -146,8 +146,8 @@ class LiqPayBase:
         """Encodes given dict to a string according to the docs"""
         return base64.b64encode(json.dumps(params).encode('utf-8')).decode('ascii')
 
-    def decode_data_from_str(self, data: str):
-        """Decoding data that were encoded by base64.b64encode(str)
+    def decode_data(self, data: str) -> dict:
+        """Decoding data that were encoded by encode_data
 
         Note:
             Often case of using is decoding data from LiqPay Callback.
@@ -164,7 +164,7 @@ class LiqPayBase:
         Example:
             liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
             data = request.POST.get('data')
-            response = liqpay.decode_data_from_str(data)
+            response = liqpay.decode_data(data)
             print(response)
             {'commission_credit': 0.0, 'order_id': 'order_id_1', 'liqpay_order_id': 'T8SRXWM71509085055293216', ...}
 
