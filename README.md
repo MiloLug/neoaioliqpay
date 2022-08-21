@@ -35,7 +35,7 @@ Working with LiqPay Callback locally
 ============
 If you need debugging API Callback on local environment use https://localtunnel.github.io/www/
 
-How it use?
+Using
 ============
 
 Example 1: Basic
@@ -90,7 +90,7 @@ Variable ``html`` will contain next html form
     </form>
 ```
 
-Example 2: Integrate Payment widget to Django
+Example 2: Integrate Payment widget with Django
 -------
 `Payment widget documentation` 
 https://www.liqpay.ua/documentation/en/api/aquiring/widget/
