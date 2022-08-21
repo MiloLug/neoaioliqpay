@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='neoliqpay',
-    version='2.0.0',
+    version='2.0.1',
     description='Asyncio LiqPay Python3 SDK',
     packages=['neoliqpay'],
     author_email='mistickusya.2012@gmail.com'

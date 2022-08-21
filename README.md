@@ -2,7 +2,7 @@
 
 [![SDK-Python3](https://www.liqpay.ua/logo_liqpay.svg?v=1651580791759)](https://www.liqpay.ua/)
 
-* Version: 2.0.0
+* Version: 2.0.1
 * Web: https://www.liqpay.ua/
 * Download: https://pypi.org/project/neoliqpay
 * Source: https://github.com/toxazhl/neoliqpay
