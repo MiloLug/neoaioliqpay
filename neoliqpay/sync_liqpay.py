@@ -34,7 +34,7 @@ class LiqPay(LiqPayBase):
         signature = self._make_signature(json_encoded_params)
 
         request_url = urljoin(self._host, url)
-        request_data = {"data": json_encoded_params, "signature": signature}
+        request_data = {'data': json_encoded_params, 'signature': signature}
         with requests.sessions.Session() as session:
             with session.post(request_url, data=request_data) as response:
                 return response.json()

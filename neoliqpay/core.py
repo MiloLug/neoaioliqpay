@@ -6,18 +6,18 @@ from typing import Optional
 from urllib.parse import urljoin
 
 class LiqPayBase:
-    DEFAULT_API_URL = "https://www.liqpay.ua/api/"
+    DEFAULT_API_URL = 'https://www.liqpay.ua/api/'
 
-    FORM_TEMPLATE = """\
-        <form method="post" action="{action}" accept-charset="utf-8">
-        \t{param_inputs}
-            <input type="image" src="//static.liqpay.ua/buttons/p1{language}.radius.png" name="btn_text" />
-        </form>"""
-    INPUT_TEMPLATE = "<input type='hidden' name='{name}' value='{value}'/>"
+    FORM_TEMPLATE = '''\
+<form method="post" action="{action}" accept-charset="utf-8">
+\t{param_inputs}
+    <input type="image" src="//static.liqpay.ua/buttons/p1{language}.radius.png" name="btn_text" />
+</form>'''
+    INPUT_TEMPLATE = '<input type="hidden" name="{name}" value="{value}"/>'
 
     SUPPORTED_PARAMS = [
-        "public_key", "amount", "currency", "description", "order_id",
-        "result_url", "server_url", "type", "signature", "language", "sandbox"
+        'public_key', 'amount', 'currency', 'description', 'order_id',
+        'result_url', 'server_url', 'type', 'signature', 'language', 'sandbox'
     ]
 
     def __init__(
@@ -46,7 +46,7 @@ class LiqPayBase:
         params = self._prepare_params(params)
         
         params.update(
-            sandbox=int(bool(params.get("sandbox", self._sandbox_mode)))
+            sandbox=int(bool(params.get('sandbox', self._sandbox_mode)))
         )
 
         encoded_data = self.data_to_sign(params)
@@ -67,19 +67,14 @@ class LiqPayBase:
         currency: Optional[str] = None,
         description: Optional[str] = None,
         order_id: Optional[str] = None,
-        language: Optional[str] = "ua",
+        language: Optional[str] = 'ua',
         customer: Optional[str] = None,
         server_url: Optional[str] = None,
         result_url: Optional[str] = None,
         params: Optional[dict] = {},
         **kwargs
     ) -> str:
-        """
-        This method contains almost same like cnb_form, except we are return just
-        url which will helpful for building Restful services.
-        :param params:
-        :return:
-        """
+        """Returns url with encoded data in the query params"""
         params.update(kwargs)
         params['action'] = action
         params['amount'] = amount
@@ -91,10 +86,9 @@ class LiqPayBase:
         params['server_url'] = server_url
         params['result_url'] = result_url
         
-        
         encoded_data = self._encode_params(params)
         signature = self._make_signature(encoded_data)
-        form_action_url = urljoin(self._host, "3/checkout/")
+        form_action_url = urljoin(self._host, '3/checkout/')
 
         return f'{form_action_url}?data={encoded_data}&signature={signature}'
 
@@ -105,14 +99,13 @@ class LiqPayBase:
         currency: Optional[str] = None,
         description: Optional[str] = None,
         order_id: Optional[str] = None,
-        language: Optional[str] = "ua",
+        language: Optional[str] = 'ua',
         customer: Optional[str] = None,
         server_url: Optional[str] = None,
         result_url: Optional[str] = None,
         params: Optional[dict] = {},
         **kwargs
     ) -> str:
-        
         params.update(kwargs)
         params['action'] = action
         params['amount'] = amount
@@ -125,33 +118,35 @@ class LiqPayBase:
         params['result_url'] = result_url
         
         encoded_data = self._encode_params(params)
-        params_templ = {"data": encoded_data}
+        params_templ = {'data': encoded_data}
         
-        params_templ["signature"] = self._make_signature(params_templ["data"])
-        form_action_url = urljoin(self._host, "3/checkout/")
+        params_templ['signature'] = self._make_signature(params_templ['data'])
+        form_action_url = urljoin(self._host, '3/checkout/')
         format_input = (lambda k, v: self.INPUT_TEMPLATE.format(name=k, value=v))
         inputs = [format_input(k, v) for k, v in params_templ.items()]
         return self.FORM_TEMPLATE.format(
             action=form_action_url,
             language=language,
-            param_inputs="\n\t".join(inputs)
+            param_inputs='\n\t'.join(inputs)
         )
 
-    def cnb_signature(self, params: dict):
+    def cnb_signature(self, params: dict) -> str:
+        """Create a signature from given params"""
         params = self._prepare_params(params)
 
         data_to_sign = self.data_to_sign(params)
         return self._make_signature(data_to_sign)
 
-    def cnb_data(self, params: dict):
+    def cnb_data(self, params: dict) -> str:
+        """Encodes fiven params using private key"""
         params = self._prepare_params(params)
         return self.data_to_sign(params)
 
     def str_to_sign(self, string: str) -> str:
-        return base64.b64encode(hashlib.sha1(string.encode("utf-8")).digest()).decode("ascii")
+        return base64.b64encode(hashlib.sha1(string.encode('utf-8')).digest()).decode('ascii')
 
     def data_to_sign(self, params: dict) -> str:
-        return base64.b64encode(json.dumps(params).encode("utf-8")).decode("ascii")
+        return base64.b64encode(json.dumps(params).encode('utf-8')).decode('ascii')
 
     def decode_data_from_str(self, data: str):
         """Decoding data that were encoded by base64.b64encode(str)
