@@ -31,8 +31,7 @@ class AsyncLiqPay(LiqPayBase):
         params = self._prepare_params(params or {})
 
         json_encoded_params = json.dumps(params)
-        private_key = self._private_key
-        signature = self._make_signature(private_key, json_encoded_params, private_key)
+        signature = self._make_signature(json_encoded_params)
 
         request_url = urljoin(self._host, url)
         request_data = {"data": json_encoded_params, "signature": signature}

@@ -32,10 +32,9 @@ class LiqPayBase:
         self._host = host or self.DEFAULT_API_URL
         self._sandbox_mode = sandbox
 
-    def _make_signature(self, *args) -> str:
-        joined_fields = "".join(x for x in args)
-        joined_fields = joined_fields.encode("utf-8")
-        return base64.b64encode(hashlib.sha1(joined_fields).digest()).decode("ascii")
+    def _make_signature(self, data: str) -> str:
+        data = self._private_key + data + self._private_key
+        return base64.b64encode(hashlib.sha1(data.encode('utf-8')).digest()).decode('ascii')
 
     def _prepare_params(self, params: dict) -> dict:
         params = {k: v for k, v in params.items() if k is not None}
@@ -94,7 +93,7 @@ class LiqPayBase:
         
         
         encoded_data = self._encode_params(params)
-        signature = self._make_signature(self._private_key, encoded_data, self._private_key)
+        signature = self._make_signature(encoded_data)
         form_action_url = urljoin(self._host, "3/checkout/")
 
         return f'{form_action_url}?data={encoded_data}&signature={signature}'
@@ -128,7 +127,7 @@ class LiqPayBase:
         encoded_data = self._encode_params(params)
         params_templ = {"data": encoded_data}
         
-        params_templ["signature"] = self._make_signature(self._private_key, params_templ["data"], self._private_key)
+        params_templ["signature"] = self._make_signature(params_templ["data"])
         form_action_url = urljoin(self._host, "3/checkout/")
         format_input = (lambda k, v: self.INPUT_TEMPLATE.format(name=k, value=v))
         inputs = [format_input(k, v) for k, v in params_templ.items()]
@@ -142,7 +141,7 @@ class LiqPayBase:
         params = self._prepare_params(params)
 
         data_to_sign = self.data_to_sign(params)
-        return self._make_signature(self._private_key, data_to_sign, self._private_key)
+        return self._make_signature(data_to_sign)
 
     def cnb_data(self, params: dict):
         params = self._prepare_params(params)
@@ -178,3 +177,6 @@ class LiqPayBase:
 
         """
         return json.loads(base64.b64decode(data).decode('utf-8'))
+
+    def callback_is_valid(self, signature: str, signed_data: str) -> bool:
+        return self._make_signature(signed_data) == signature

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "neoliqpay"
-version = "2.1.1"
+version = "2.2.0"
 description = "Asyncio LiqPay SDK for Python"
 readme = "README.md"
 authors = [{ name = "LiaVa", email = "mistickusya.2012@gmail.com" }]
