@@ -93,3 +93,4 @@ cached_uglify
 .idea
 
 .pypirc
+.venv

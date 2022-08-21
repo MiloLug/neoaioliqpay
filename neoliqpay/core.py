@@ -6,6 +6,8 @@ from typing import Optional
 from urllib.parse import urljoin
 
 class LiqPayBase:
+    DEFAULT_API_URL = "https://www.liqpay.ua/api/"
+
     FORM_TEMPLATE = """\
         <form method="post" action="{action}" accept-charset="utf-8">
         \t{param_inputs}
@@ -18,23 +20,23 @@ class LiqPayBase:
         "result_url", "server_url", "type", "signature", "language", "sandbox"
     ]
 
-    def __init__(self, public_key: str, private_key: str, host="https://www.liqpay.ua/api/"):
+    def __init__(self, public_key: str, private_key: str, host: Optional[str] = None):
         self._public_key = public_key
         self._private_key = private_key
-        self._host = host
+        self._host = host or self.DEFAULT_API_URL
 
     def _make_signature(self, *args):
         joined_fields = "".join(x for x in args)
         joined_fields = joined_fields.encode("utf-8")
         return base64.b64encode(hashlib.sha1(joined_fields).digest()).decode("ascii")
 
-    def _prepare_params(self, params):
+    def _prepare_params(self, params: dict):
         params = {k: v for k, v in params.items() if k is not None}
         params = {} if params is None else deepcopy(params)
         params.update(public_key=self._public_key)
         return params
 
-    def _encode_params(self, params):
+    def _encode_params(self, params: dict):
         """
         :param params: dict
         :return: dict
@@ -58,16 +60,16 @@ class LiqPayBase:
 
     def checkout_url(
         self,
-        action: str,
-        amount: float = None,
-        currency: str = None,
-        description: str = None,
-        order_id: str = None,
-        language: str = "ua",
-        customer: str = None,
-        server_url: str = None,
-        result_url: str = None,
-        params: dict = {},
+        action: Optional[str],
+        amount: Optional[float] = None,
+        currency: Optional[str] = None,
+        description: Optional[str] = None,
+        order_id: Optional[str] = None,
+        language: Optional[str] = "ua",
+        customer: Optional[str] = None,
+        server_url: Optional[str] = None,
+        result_url: Optional[str] = None,
+        params: Optional[dict] = {},
         **kwargs
     ):
         """
@@ -96,16 +98,16 @@ class LiqPayBase:
 
     def cnb_form(
         self,
-        action: str,
-        amount: float = None,
-        currency: str = None,
-        description: str = None,
-        order_id: str = None,
-        language: str = "ua",
-        customer: str = None,
-        server_url: str = None,
-        result_url: str = None,
-        params: dict = {},
+        action: Optional[str],
+        amount: Optional[float] = None,
+        currency: Optional[str] = None,
+        description: Optional[str] = None,
+        order_id: Optional[str] = None,
+        language: Optional[str] = "ua",
+        customer: Optional[str] = None,
+        server_url: Optional[str] = None,
+        result_url: Optional[str] = None,
+        params: Optional[dict] = {},
         **kwargs
     ):
         
@@ -133,23 +135,23 @@ class LiqPayBase:
             param_inputs="\n\t".join(inputs)
         )
 
-    def cnb_signature(self, params):
+    def cnb_signature(self, params: dict):
         params = self._prepare_params(params)
 
         data_to_sign = self.data_to_sign(params)
         return self._make_signature(self._private_key, data_to_sign, self._private_key)
 
-    def cnb_data(self, params):
+    def cnb_data(self, params: dict):
         params = self._prepare_params(params)
         return self.data_to_sign(params)
 
-    def str_to_sign(self, str):
-        return base64.b64encode(hashlib.sha1(str.encode("utf-8")).digest()).decode("ascii")
+    def str_to_sign(self, string: str):
+        return base64.b64encode(hashlib.sha1(string.encode("utf-8")).digest()).decode("ascii")
 
-    def data_to_sign(self, params):
+    def data_to_sign(self, params: dict):
         return base64.b64encode(json.dumps(params).encode("utf-8")).decode("ascii")
 
-    def decode_data_from_str(self, data):
+    def decode_data_from_str(self, data: str):
         """Decoding data that were encoded by base64.b64encode(str)
 
         Note:

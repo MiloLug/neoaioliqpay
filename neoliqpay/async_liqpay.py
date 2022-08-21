@@ -11,11 +11,11 @@ from .core import LiqPayBase
 
 
 class AsyncLiqPay(LiqPayBase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, public_key: str, private_key: str, host: Optional[str] = None):
         if not aiohttp:
             raise NotImplementedError('aiohttp not found')
 
-        super(AsyncLiqPay, self).__init__(*args, **kwargs)
+        super(AsyncLiqPay, self).__init__(public_key, private_key, host)
 
     async def api(
         self, 
