@@ -2,7 +2,7 @@
 
 [![SDK-Python3](https://www.liqpay.ua/logo_liqpay.svg?v=1651580791759)](https://www.liqpay.ua/)
 
-* Version: 1.0.0
+* Version: 2.0.0
 * Web: https://www.liqpay.ua/
 * Download: https://pypi.org/project/aioliqpay
 * Source: https://github.com/toxazhl/aioliqpay
@@ -23,8 +23,13 @@ Get Started
 
 Installation
 ============
-From pip
-```pip install aioliqpay```
+From pip:
+
+```bash
+pip install "neoaioliqpay[sync]"   # for sync variant
+
+pip install "neoaioliqpay[async]"  # for async variant
+```
 
 Working with LiqPay Callback locally
 ============

@@ -2,12 +2,10 @@ import base64
 from copy import deepcopy
 import hashlib
 import json
+from typing import Optional
 from urllib.parse import urljoin
 
-import aiohttp
-
-
-class LiqPay(object):
+class LiqPayBase:
     FORM_TEMPLATE = """\
         <form method="post" action="{action}" accept-charset="utf-8">
         \t{param_inputs}
@@ -54,18 +52,9 @@ class LiqPay(object):
     async def api(
         self, 
         url: str,
-        params: dict = {}):
-        params = self._prepare_params(params)
-
-        json_encoded_params = json.dumps(params)
-        private_key = self._private_key
-        signature = self._make_signature(private_key, json_encoded_params, private_key)
-
-        request_url = urljoin(self._host, url)
-        request_data = {"data": json_encoded_params, "signature": signature}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(request_url, data=request_data) as response:
-                return await response.json()
+        params: Optional[dict] = None
+    ):
+        raise NotImplementedError()
 
     def checkout_url(
         self,
@@ -80,7 +69,7 @@ class LiqPay(object):
         result_url: str = None,
         params: dict = {},
         **kwargs
-        ):
+    ):
         """
         This method contains almost same like cnb_form, except we are return just
         url which will helpful for building Restful services.
@@ -118,7 +107,7 @@ class LiqPay(object):
         result_url: str = None,
         params: dict = {},
         **kwargs
-        ):
+    ):
         
         params.update(kwargs)
         params['action'] = action

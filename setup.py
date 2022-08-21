@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
 
 setup(
     name='aioliqpay',
-    version='1.0.0',
+    version='2.0.0',
     description='Asyncio LiqPay Python3 SDK',
     packages=['aioliqpay'],
-    author_email='zhltoxa@gmail.com'
+    author_email='mistickusya.2012@gmail.com'
 )
