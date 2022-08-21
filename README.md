@@ -24,12 +24,14 @@
 
 ## Installation
 
-From pip:
+With pip:
 
 ```bash
-pip install "neoliqpay[sync]"   # for sync variant
+pip install neoliqpay[sync]   # for sync variant
 
-pip install "neoliqpay[async]"  # for async variant
+pip install neoliqpay[async]  # for async variant
+
+pip install neoliqpay[async,sync]  # for both
 ```
 
 ## Working with LiqPay Callback locally
