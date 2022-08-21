@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aioliqpay"
+name = "neoliqpay"
 version = "1.0.0"
 description = "Asyncio LiqPay SDK for Python"
 readme = "README.md"
@@ -17,7 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
 ]
-keywords = ["neoaioliqpay", "aioliqpay", "liqpay", "asyncio", "sdk"]
+keywords = ["neoneoliqpay", "aioliqpay", "liqpay", "asyncio", "sdk"]
 dependencies = []
 requires-python = ">=3.6"
 
@@ -27,4 +27,4 @@ async = ["aiohttp"]
 sync = ["requests"]
 
 [project.urls]
-Homepage = "https://github.com/MiloLug/neoaioliqpay"
+Homepage = "https://github.com/MiloLug/neoliqpay"

@@ -4,10 +4,10 @@
 
 * Version: 2.0.0
 * Web: https://www.liqpay.ua/
-* Download: https://pypi.org/project/aioliqpay
-* Source: https://github.com/toxazhl/aioliqpay
+* Download: https://pypi.org/project/neoliqpay
+* Source: https://github.com/toxazhl/neoliqpay
 * Documentation: https://www.liqpay.ua/documentation/en/
-* Keywords: aioliqpay, liqpay, privat24, privatbank, python, internet acquiring, P2P payments, two-step payments, asyncio
+* Keywords: neoliqpay, aioliqpay, liqpay, privat24, privatbank, python, internet acquiring, P2P payments, two-step payments, asyncio
 
 
 What python version is supported?
@@ -26,9 +26,9 @@ Installation
 From pip:
 
 ```bash
-pip install "neoaioliqpay[sync]"   # for sync variant
+pip install "neoliqpay[sync]"   # for sync variant
 
-pip install "neoaioliqpay[async]"  # for async variant
+pip install "neoliqpay[async]"  # for async variant
 ```
 
 Working with LiqPay Callback locally
@@ -101,7 +101,7 @@ https://www.liqpay.ua/documentation/en/api/aquiring/widget/
 
 ```
 
-    from aioliqpay import LiqPay
+    from neoliqpay import LiqPay
 
     from django.views.generic import TemplateView
     from django.shortcuts import render
